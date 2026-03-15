@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopZone Admin — Manage Products</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <span class="logo">shopzone<span>.in</span></span>
+      <span class="header-tag">Admin Panel</span>
+      <a href="index.html" class="header-link">← View Store</a>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Add/Edit Form -->
+    <section class="form-section">
+      <h2 id="formTitle">Add New Product</h2>
+      <form id="productForm" class="product-form">
+        <input type="hidden" id="editId">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pName">Product Name</label>
+            <input type="text" id="pName" required placeholder="e.g. Wireless Earbuds">
+          </div>
+          <div class="form-group">
+            <label for="pCategory">Category</label>
+            <select id="pCategory" required>
+              <option value="">Select</option>
+              <option value="electronics">Electronics</option>
+              <option value="fashion">Fashion</option>
+              <option value="home">Home & Kitchen</option>
+              <option value="grocery">Grocery</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pPrice">Selling Price (₹)</label>
+            <input type="number" id="pPrice" required min="1" placeholder="999">
+          </div>
+          <div class="form-group">
+            <label for="pOriginalPrice">MRP / Original Price (₹)</label>
+            <input type="number" id="pOriginalPrice" required min="1" placeholder="1999">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pImage">Product Image</label>
+            <div class="image-input-wrap">
+              <input type="file" id="pImageFile" accept="image/*" class="file-input">
+              <label for="pImageFile" class="file-label">📁 Choose Image</label>
+              <span class="file-or">or</span>
+              <input type="url" id="pImage" placeholder="Paste image URL">
+            </div>
+            <div class="image-preview" id="imagePreview" hidden>
+              <img id="previewImg" alt="Preview">
+              <button type="button" id="clearImage" class="btn-clear-img">✕ Remove</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pType">Product Type</label>
+            <select id="pType" required>
+              <option value="own">Our Collection</option>
+              <option value="affiliate">Partner / Affiliate</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="affiliateRow" hidden>
+          <div class="form-group full">
+            <label for="pLink">Affiliate Link</label>
+            <input type="url" id="pLink" placeholder="https://affiliate-link.com/...">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pBadge">Badge (optional)</label>
+            <input type="text" id="pBadge" placeholder="e.g. Best Seller, New Arrival">
+          </div>
+          <div class="form-group">
+            <label for="pRating">Rating (1-5)</label>
+            <input type="number" id="pRating" min="1" max="5" step="0.1" value="4.0">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-save" id="btnSave">Add Product</button>
+          <button type="button" class="btn-cancel" id="btnCancel" hidden onclick="resetForm()">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Product List -->
+    <section class="list-section">
+      <div class="list-header">
+        <h2>All Products (<span id="productCount">0</span>)</h2>
+      </div>
+      <div class="product-list" id="productList"></div>
+      <p class="empty-msg" id="emptyMsg" hidden>No products yet. Add your first product above.</p>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
