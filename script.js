@@ -399,7 +399,7 @@ locClear.addEventListener('click', () => { clearLocation(); });
 // Init location
 initLocation();
 
-// ===== LOGIN / OTP (Firebase Phone Auth) =====
+// ===== LOGIN / GOOGLE AUTH + PHONE COLLECTION =====
 const accountBtn = document.getElementById('accountBtn');
 const accountLine1 = document.getElementById('accountLine1');
 const accountLine2 = document.getElementById('accountLine2');
@@ -408,83 +408,115 @@ const loginClose = document.getElementById('loginClose');
 const loginStep1 = document.getElementById('loginStep1');
 const loginStep2 = document.getElementById('loginStep2');
 const loginPhone = document.getElementById('loginPhone');
-const loginPhoneDisplay = document.getElementById('loginPhoneDisplay');
 const loginPhoneError = document.getElementById('loginPhoneError');
-const loginSendOtp = document.getElementById('loginSendOtp');
-const loginVerifyOtp = document.getElementById('loginVerifyOtp');
-const loginOtpError = document.getElementById('loginOtpError');
-const loginResend = document.getElementById('loginResend');
-const loginBack = document.getElementById('loginBack');
-const otpBoxes = [1,2,3,4,5,6].map(i => document.getElementById('loginOtp' + i));
+const loginGoogleError = document.getElementById('loginGoogleError');
+const googleSignInBtn = document.getElementById('googleSignInBtn');
+const loginSavePhone = document.getElementById('loginSavePhone');
+const loginWelcome = document.getElementById('loginWelcome');
 
-let confirmationResult = null;
-let loginPhoneNum = '';
-let recaptchaVerifier = null;
-let recaptchaWidgetId = null;
+const db = firebase.firestore();
+let pendingUser = null;
+const accountDropdown = document.getElementById('accountDropdown');
+const accountDdPhoto = document.getElementById('accountDdPhoto');
+const accountDdName = document.getElementById('accountDdName');
+const accountDdEmail = document.getElementById('accountDdEmail');
+const ddSignOut = document.getElementById('ddSignOut');
 
-// Setup invisible reCAPTCHA (required by Firebase Phone Auth)
-function setupRecaptcha() {
-  if (recaptchaVerifier) return;
-  recaptchaVerifier = new firebase.auth.RecaptchaVerifier('loginSendOtp', {
-    size: 'invisible',
-    callback: () => { /* reCAPTCHA solved — will proceed with sendOtp */ },
-    'expired-callback': () => { recaptchaVerifier = null; setupRecaptcha(); }
-  });
-  recaptchaVerifier.render().then(id => { recaptchaWidgetId = id; });
-}
-
-// Check Firebase auth state on load
 function initAuth() {
-  firebase.auth().onAuthStateChanged((user) => {
+  firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
-      accountLine1.textContent = 'Hello, User';
-      accountLine2.textContent = user.phoneNumber || '';
-      localStorage.setItem('shopzone_user', JSON.stringify({
-        phone: user.phoneNumber, uid: user.uid, loggedAt: new Date().toISOString()
-      }));
-    } else {
-      const cached = localStorage.getItem('shopzone_user');
-      if (cached) {
-        try {
-          const u = JSON.parse(cached);
-          accountLine1.textContent = 'Hello, User';
-          accountLine2.textContent = u.phone;
-        } catch { /* ignore */ }
+      const doc = await db.collection('customers').doc(user.uid).get();
+      if (doc.exists && doc.data().phone) {
+        const firstName = (user.displayName || 'User').split(' ')[0];
+        accountLine1.textContent = 'Hello, ' + firstName;
+        accountLine2.textContent = 'Account ▾';
+        // Populate dropdown
+        accountDdName.textContent = user.displayName || 'User';
+        accountDdEmail.textContent = user.email || '';
+        if (user.photoURL) { accountDdPhoto.src = user.photoURL; accountDdPhoto.hidden = false; }
+      } else {
+        pendingUser = user;
+        showPhoneStep(user);
       }
     }
   });
 }
 
+function showPhoneStep(user) {
+  loginStep1.hidden = true;
+  loginStep2.hidden = false;
+  loginPhoneError.hidden = true;
+  const photo = user.photoURL ? `<img src="${user.photoURL}" alt="">` : '';
+  loginWelcome.innerHTML = photo + `<span>Welcome, <strong>${user.displayName || user.email}</strong></span>`;
+  loginOverlay.classList.add('open');
+}
+
 function openLogin() {
-  // Check if already signed in
   const user = firebase.auth().currentUser;
   if (user) {
-    if (confirm('You are signed in as ' + user.phoneNumber + '. Sign out?')) {
-      firebase.auth().signOut();
-      localStorage.removeItem('shopzone_user');
-      accountLine1.textContent = 'Hello, sign in';
-      accountLine2.textContent = 'Account ▾';
-    }
+    // Check if profile is complete
+    db.collection('customers').doc(user.uid).get().then(doc => {
+      if (doc.exists && doc.data().phone) {
+        // Toggle dropdown
+        accountDropdown.classList.toggle('open');
+      } else {
+        pendingUser = user;
+        showPhoneStep(user);
+      }
+    });
     return;
   }
   loginStep1.hidden = false;
   loginStep2.hidden = true;
+  loginGoogleError.hidden = true;
   loginPhoneError.hidden = true;
-  loginOtpError.hidden = true;
-  loginPhone.value = '';
-  otpBoxes.forEach(b => b.value = '');
   loginOverlay.classList.add('open');
-  setupRecaptcha();
 }
 
-function closeLogin() { loginOverlay.classList.remove('open'); }
+function closeLogin() {
+  if (!loginStep2.hidden && pendingUser) return;
+  loginOverlay.classList.remove('open');
+}
 
 accountBtn.addEventListener('click', (e) => { e.preventDefault(); openLogin(); });
 loginClose.addEventListener('click', closeLogin);
 loginOverlay.addEventListener('click', (e) => { if (e.target === loginOverlay) closeLogin(); });
 
-// Send OTP via Firebase
-loginSendOtp.addEventListener('click', () => {
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  if (!accountBtn.contains(e.target) && !accountDropdown.contains(e.target)) {
+    accountDropdown.classList.remove('open');
+  }
+});
+
+// Sign out from dropdown
+ddSignOut.addEventListener('click', () => {
+  firebase.auth().signOut();
+  accountLine1.textContent = 'Hello, sign in';
+  accountLine2.textContent = 'Account ▾';
+  accountDropdown.classList.remove('open');
+  accountDdPhoto.hidden = true;
+});
+
+// Google Sign-In
+googleSignInBtn.addEventListener('click', () => {
+  loginGoogleError.hidden = true;
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider)
+    .then((result) => {
+      pendingUser = result.user;
+      showPhoneStep(result.user);
+    })
+    .catch((error) => {
+      console.error('Google sign-in error:', error);
+      if (error.code === 'auth/popup-closed-by-user') return;
+      loginGoogleError.textContent = 'Sign-in failed. Please try again.';
+      loginGoogleError.hidden = false;
+    });
+});
+
+// Save phone number to Firestore
+loginSavePhone.addEventListener('click', () => {
   const phone = loginPhone.value.trim();
   if (!/^\d{10}$/.test(phone)) {
     loginPhoneError.textContent = 'Please enter a valid 10-digit mobile number.';
@@ -492,127 +524,35 @@ loginSendOtp.addEventListener('click', () => {
     return;
   }
   loginPhoneError.hidden = true;
-  loginPhoneNum = phone;
-  loginSendOtp.textContent = 'Sending...';
-  loginSendOtp.disabled = true;
+  loginSavePhone.textContent = 'Saving...';
+  loginSavePhone.disabled = true;
 
-  const fullNumber = '+91' + phone;
+  const user = pendingUser || firebase.auth().currentUser;
+  if (!user) { loginPhoneError.textContent = 'Session expired. Please sign in again.'; loginPhoneError.hidden = false; return; }
 
-  firebase.auth().signInWithPhoneNumber(fullNumber, recaptchaVerifier)
-    .then((result) => {
-      confirmationResult = result;
-      loginPhoneDisplay.textContent = '+91 ' + phone;
-      loginStep1.hidden = true;
-      loginStep2.hidden = false;
-      otpBoxes[0].focus();
+  db.collection('customers').doc(user.uid).set({
+    name: user.displayName || '',
+    email: user.email || '',
+    phone: '+91' + phone,
+    photo: user.photoURL || '',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true })
+    .then(() => {
+      accountLine1.textContent = 'Hello, ' + (user.displayName || 'User').split(' ')[0];
+      accountLine2.textContent = 'Account ▾';
+      pendingUser = null;
+      loginOverlay.classList.remove('open');
     })
     .catch((error) => {
-      console.error('Firebase OTP error:', error);
-      let msg = 'Failed to send OTP. Please try again.';
-      if (error.code === 'auth/too-many-requests') msg = 'Too many attempts. Please try again later.';
-      if (error.code === 'auth/invalid-phone-number') msg = 'Invalid phone number.';
-      if (error.code === 'auth/quota-exceeded') msg = 'SMS quota exceeded. Try again tomorrow.';
-      loginPhoneError.textContent = msg;
+      console.error('Firestore error:', error);
+      loginPhoneError.textContent = 'Could not save. Please try again.';
       loginPhoneError.hidden = false;
-      // Reset reCAPTCHA for retry
-      if (typeof grecaptcha !== 'undefined' && recaptchaWidgetId !== null) {
-        grecaptcha.reset(recaptchaWidgetId);
-      }
     })
     .finally(() => {
-      loginSendOtp.textContent = 'Send OTP';
-      loginSendOtp.disabled = false;
+      loginSavePhone.textContent = 'Continue';
+      loginSavePhone.disabled = false;
     });
-});
-
-// OTP box auto-focus
-otpBoxes.forEach((box, i) => {
-  box.addEventListener('input', () => {
-    box.value = box.value.replace(/\D/g, '');
-    if (box.value && i < 5) otpBoxes[i + 1].focus();
-  });
-  box.addEventListener('keydown', (e) => {
-    if (e.key === 'Backspace' && !box.value && i > 0) otpBoxes[i - 1].focus();
-  });
-  box.addEventListener('paste', (e) => {
-    e.preventDefault();
-    const paste = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
-    paste.split('').forEach((ch, j) => { if (otpBoxes[j]) otpBoxes[j].value = ch; });
-    if (paste.length > 0) otpBoxes[Math.min(paste.length, 5)].focus();
-  });
-});
-
-// Verify OTP via Firebase
-loginVerifyOtp.addEventListener('click', () => {
-  const entered = otpBoxes.map(b => b.value).join('');
-  if (entered.length < 6) {
-    loginOtpError.textContent = 'Please enter the complete 6-digit OTP.';
-    loginOtpError.hidden = false;
-    return;
-  }
-  if (!confirmationResult) {
-    loginOtpError.textContent = 'Session expired. Please request a new OTP.';
-    loginOtpError.hidden = false;
-    return;
-  }
-  loginOtpError.hidden = true;
-  loginVerifyOtp.textContent = 'Verifying...';
-  loginVerifyOtp.disabled = true;
-
-  confirmationResult.confirm(entered)
-    .then((result) => {
-      const user = result.user;
-      localStorage.setItem('shopzone_user', JSON.stringify({
-        phone: user.phoneNumber, uid: user.uid, loggedAt: new Date().toISOString()
-      }));
-      accountLine1.textContent = 'Hello, User';
-      accountLine2.textContent = user.phoneNumber;
-      closeLogin();
-    })
-    .catch((error) => {
-      console.error('OTP verify error:', error);
-      let msg = 'Invalid OTP. Please try again.';
-      if (error.code === 'auth/code-expired') msg = 'OTP expired. Please request a new one.';
-      loginOtpError.textContent = msg;
-      loginOtpError.hidden = false;
-    })
-    .finally(() => {
-      loginVerifyOtp.textContent = 'Verify & Sign In';
-      loginVerifyOtp.disabled = false;
-    });
-});
-
-// Resend OTP
-loginResend.addEventListener('click', () => {
-  otpBoxes.forEach(b => b.value = '');
-  otpBoxes[0].focus();
-  loginOtpError.hidden = true;
-
-  // Reset reCAPTCHA and resend
-  recaptchaVerifier = null;
-  setupRecaptcha();
-
-  const fullNumber = '+91' + loginPhoneNum;
-  firebase.auth().signInWithPhoneNumber(fullNumber, recaptchaVerifier)
-    .then((result) => {
-      confirmationResult = result;
-      loginOtpError.textContent = 'New OTP sent successfully.';
-      loginOtpError.style.color = '#007600';
-      loginOtpError.hidden = false;
-      setTimeout(() => { loginOtpError.style.color = ''; loginOtpError.hidden = true; }, 3000);
-    })
-    .catch((error) => {
-      console.error('Resend error:', error);
-      loginOtpError.textContent = 'Failed to resend. Please try again.';
-      loginOtpError.hidden = false;
-    });
-});
-
-// Back to phone step
-loginBack.addEventListener('click', () => {
-  loginStep1.hidden = false;
-  loginStep2.hidden = true;
-  confirmationResult = null;
 });
 
 initAuth();
