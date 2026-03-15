@@ -411,19 +411,48 @@ img { display: block; }
 .login-terms a { color: #007185; }
 .login-terms a:hover { text-decoration: underline; color: #c7511f; }
 
-/* OTP Boxes */
-.login-otp-row { display: flex; gap: 8px; justify-content: center; }
-.otp-box {
-  width: 44px; height: 48px; text-align: center; font-size: 20px; font-weight: 700;
-  border: 2px solid #ddd; border-radius: 6px; outline: none;
-  transition: border-color 0.15s;
+/* Account Dropdown */
+.nav-link { position: relative; }
+.account-dropdown {
+  position: absolute; top: 100%; right: 0; width: 260px;
+  background: #fff; border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  z-index: 150; display: none; color: #0f1111; padding: 12px 0;
+  border: 1px solid #d5d9d9;
 }
-.otp-box:focus { border-color: #e77600; box-shadow: 0 0 0 3px rgba(228,121,17,0.2); }
-.login-resend { font-size: 13px; color: #565959; text-align: center; margin-top: 14px; }
-.login-resend button { color: #007185; background: none; border: none; cursor: pointer; font-size: 13px; }
-.login-resend button:hover { text-decoration: underline; color: #c7511f; }
-.login-back {
-  display: block; margin: 12px auto 0; font-size: 13px; color: #007185;
-  background: none; border: none; cursor: pointer;
+.account-dropdown.open { display: block; }
+.account-dd-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 18px 12px;
 }
-.login-back:hover { text-decoration: underline; color: #c7511f; }
+.account-dd-photo { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.account-dd-name { font-size: 14px; font-weight: 700; }
+.account-dd-email { font-size: 12px; color: #565959; }
+.account-dd-divider { height: 1px; background: #e7e7e7; margin: 4px 0; }
+.account-dd-item {
+  display: block; width: 100%; padding: 9px 18px; font-size: 13px;
+  color: #0f1111; text-align: left; background: none; border: none;
+  cursor: pointer; transition: background 0.12s;
+}
+.account-dd-item:hover { background: #f0f0f0; }
+.account-dd-signout { color: #cc0c39; font-weight: 600; }
+.account-dd-signout:hover { background: #fff5f5; }
+
+/* Google Sign-In Button */
+.btn-google-signin {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 11px 16px; background: #fff; border: 1px solid #dadce0;
+  border-radius: 8px; font-size: 15px; font-weight: 500; color: #3c4043;
+  cursor: pointer; transition: background 0.15s, box-shadow 0.15s;
+}
+.btn-google-signin:hover { background: #f7f8f8; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.btn-google-signin svg { flex-shrink: 0; }
+
+/* Welcome line after Google sign-in */
+.login-welcome {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; background: #f0f8ff; border-radius: 6px;
+  margin-bottom: 16px; font-size: 13px; color: #0f1111;
+}
+.login-welcome img {
+  width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+}
