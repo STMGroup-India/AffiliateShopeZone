@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopZone.in: Online Shopping</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <span class="logo-main">shopzone</span><span class="logo-in">.in</span>
+      </a>
+      <div class="deliver-to" id="deliverTo">
+        <span class="deliver-label">Deliver to</span>
+        <span class="deliver-location" id="deliverLocation">📍 Select location</span>
+      </div>
+      <div class="search-bar">
+        <select class="search-select" id="searchCategory" aria-label="Search in">
+          <option value="all">All Categories</option>
+          <option value="electronics">Electronics</option>
+          <option value="fashion">Fashion</option>
+          <option value="home">Home &amp; Kitchen</option>
+          <option value="grocery">Grocery</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="Search ShopZone.in" aria-label="Search">
+        <button class="search-submit" id="searchBtn" aria-label="Go">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+      </div>
+      <a href="#" class="nav-link" id="accountBtn">
+        <span class="nav-line1" id="accountLine1">Hello, sign in</span>
+        <span class="nav-line2" id="accountLine2">Account ▾</span>
+      </a>
+      <a href="#" class="nav-link">
+        <span class="nav-line1">Returns</span>
+        <span class="nav-line2">&amp; Orders</span>
+      </a>
+      <button class="nav-cart" id="cartBtn" aria-label="Shopping cart">
+        <span class="cart-count" id="cartCount">0</span>
+        <svg width="30" height="26" viewBox="0 0 40 35"><path d="M10 30a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm20 0a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM2 2h6l3.6 18a2 2 0 0 0 2 1.6h15.8a2 2 0 0 0 2-1.6L36 8H8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="cart-text">Cart</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sub Nav -->
+  <nav class="subnav">
+    <div class="subnav-inner">
+      <button class="subnav-btn active" data-type="all">All Products</button>
+      <button class="subnav-btn" data-type="own">Our Collection</button>
+      <button class="subnav-btn" data-type="affiliate">Top Picks from Partners</button>
+    </div>
+  </nav>
+
+  <!-- Hero Banner -->
+  <section class="hero" aria-label="Promotions">
+    <div class="hero-bg"></div>
+    <div class="hero-fade"></div>
+    <div class="hero-content">
+      <div class="hero-card-main">
+        <h1>Welcome to ShopZone.in</h1>
+        <p>Discover amazing deals on electronics, fashion, home essentials and more. Shop from our collection or explore top picks from trusted partners.</p>
+        <a href="#products" class="btn-amazon-yellow hero-btn">Start Shopping</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <main id="products" class="products-section">
+    <div class="section-bar">
+      <h2 id="sectionTitle">All Products</h2>
+      <span class="product-count" id="productCountLabel"></span>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+    <div class="no-results" id="noResults" hidden>
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <p>No products found</p>
+      <span>Try a different search or category</span>
+    </div>
+  </main>
+
+  <!-- Cart Sidebar -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h2>Shopping Cart</h2>
+      <button id="closeCart" aria-label="Close">&times;</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <p class="cart-subtotal">Subtotal (<span id="cartItemCount">0</span> items): <strong>₹<span id="cartTotal">0</span></strong></p>
+      <button class="btn-amazon-yellow cart-checkout" id="checkoutBtn">Proceed to Buy</button>
+    </div>
+  </aside>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <a href="#" class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to top</a>
+    <div class="footer-mid">
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h3>Get to Know Us</h3>
+          <a href="#">About Us</a>
+          <a href="#">Returns Centre</a>
+          <a href="#">Help</a>
+        </div>
+        <div class="footer-col">
+          <h3>Connect with Us</h3>
+          <a href="#">Facebook</a>
+          <a href="#">Twitter</a>
+          <a href="#">Instagram</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <span class="footer-logo">shopzone<span>.in</span></span>
+        <p>&copy; 2026, ShopZone.in, Inc. or its affiliates</p>
+        <p style="margin-top:6px;">Developed by <strong>TMS Groups</strong></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-modal">
+      <button class="login-close" id="loginClose">&times;</button>
+      <div class="login-logo">shopzone<span>.in</span></div>
+
+      <!-- Step 1: Phone -->
+      <div id="loginStep1">
+        <h3>Sign in</h3>
+        <p class="login-desc">Enter your mobile number to continue</p>
+        <div class="login-field">
+          <label for="loginPhone">Mobile Number</label>
+          <div class="login-phone-row">
+            <span class="login-prefix">+91</span>
+            <input type="tel" id="loginPhone" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric">
+          </div>
+        </div>
+        <button class="btn-amazon-yellow login-submit" id="loginSendOtp">Send OTP</button>
+        <p class="login-error" id="loginPhoneError" hidden></p>
+        <p class="login-terms">By continuing, you agree to ShopZone's <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>.</p>
+      </div>
+
+      <!-- Step 2: OTP -->
+      <div id="loginStep2" hidden>
+        <h3>Verify OTP</h3>
+        <p class="login-desc">Enter the 6-digit code sent to <strong id="loginPhoneDisplay"></strong></p>
+        <div class="login-field">
+          <label for="loginOtp">OTP</label>
+          <div class="login-otp-row">
+            <input type="text" id="loginOtp1" maxlength="1" inputmode="numeric" class="otp-box">
+            <input type="text" id="loginOtp2" maxlength="1" inputmode="numeric" class="otp-box">
+            <input type="text" id="loginOtp3" maxlength="1" inputmode="numeric" class="otp-box">
+            <input type="text" id="loginOtp4" maxlength="1" inputmode="numeric" class="otp-box">
+            <input type="text" id="loginOtp5" maxlength="1" inputmode="numeric" class="otp-box">
+            <input type="text" id="loginOtp6" maxlength="1" inputmode="numeric" class="otp-box">
+          </div>
+        </div>
+        <button class="btn-amazon-yellow login-submit" id="loginVerifyOtp">Verify & Sign In</button>
+        <p class="login-error" id="loginOtpError" hidden></p>
+        <p class="login-resend">Didn't receive it? <button id="loginResend">Resend OTP</button></p>
+        <button class="login-back" id="loginBack">← Change number</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Location Modal -->
+  <div class="loc-modal-overlay" id="locOverlay">
+    <div class="loc-modal">
+      <div class="loc-modal-header">
+        <h3>Choose your location</h3>
+        <button class="loc-close" id="locClose">&times;</button>
+      </div>
+      <p class="loc-desc">Delivery options and speeds may vary for different locations.</p>
+      <div class="loc-section">
+        <label for="locPincode">Enter Pincode</label>
+        <div class="loc-input-row">
+          <input type="text" id="locPincode" placeholder="e.g. 560001" maxlength="6" pattern="[0-9]*" inputmode="numeric">
+          <button class="btn-amazon-yellow loc-apply" id="locApply">Apply</button>
+        </div>
+        <p class="loc-error" id="locError" hidden>Please enter a valid 6-digit pincode.</p>
+      </div>
+      <div class="loc-divider"><span>or</span></div>
+      <button class="loc-detect" id="locDetect">📍 Detect my location</button>
+      <p class="loc-detecting" id="locDetecting" hidden>Detecting location...</p>
+
+      <!-- Address Form (shows after pincode) -->
+      <div class="loc-address-form" id="locAddressForm" hidden>
+        <div class="loc-divider"><span>Delivery Address</span></div>
+        <div class="loc-field">
+          <label for="locName">Full Name</label>
+          <input type="text" id="locName" placeholder="John Doe">
+        </div>
+        <div class="loc-field">
+          <label for="locPhone">Phone Number</label>
+          <input type="tel" id="locPhone" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric">
+        </div>
+        <div class="loc-field">
+          <label for="locFlat">Flat / House No / Building</label>
+          <input type="text" id="locFlat" placeholder="e.g. Flat 301, Tower B">
+        </div>
+        <div class="loc-field">
+          <label for="locStreet">Area / Street / Locality</label>
+          <input type="text" id="locStreet" placeholder="e.g. MG Road, Koramangala">
+        </div>
+        <div class="loc-field-row">
+          <div class="loc-field">
+            <label for="locCity">City</label>
+            <input type="text" id="locCity" placeholder="City" readonly>
+          </div>
+          <div class="loc-field">
+            <label for="locState">State</label>
+            <input type="text" id="locState" placeholder="State" readonly>
+          </div>
+        </div>
+        <div class="loc-field">
+          <label for="locPinDisplay">Pincode</label>
+          <input type="text" id="locPinDisplay" readonly>
+        </div>
+        <button class="btn-amazon-yellow loc-save-addr" id="locSaveAddr">Save Address</button>
+        <p class="loc-addr-error" id="locAddrError" hidden>Please fill in all required fields.</p>
+      </div>
+
+      <div class="loc-current" id="locCurrent" hidden>
+        <div class="loc-current-info">
+          <p><strong id="locCurrentText"></strong></p>
+          <p class="loc-current-detail" id="locCurrentDetail"></p>
+        </div>
+        <button class="loc-clear" id="locClear">Change</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAK2Tk1aiYoFp97j2z3qCoatKZzXvCnx-0",
+      authDomain: "shopzone-be817.firebaseapp.com",
+      projectId: "shopzone-be817",
+      storageBucket: "shopzone-be817.firebasestorage.app",
+      messagingSenderId: "215310891807",
+      appId: "1:215310891807:web:c0a694c0f3b4be71e28e2a",
+      measurementId: "G-PVTQGGJL88"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>
