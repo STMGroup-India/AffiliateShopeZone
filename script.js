@@ -27,7 +27,7 @@ const typeLabels = { all: 'All Products', own: 'Our Collection', affiliate: 'Top
 // Load products from Firestore (real-time)
 function loadProducts() {
   const productsRef = firebase.firestore().collection('products');
-  productsRef.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+  productsRef.onSnapshot((snapshot) => {
     products = [];
     snapshot.forEach(doc => {
       products.push({ id: doc.id, ...doc.data() });
