@@ -24,30 +24,19 @@ const productCountLabel = document.getElementById('productCountLabel');
 
 const typeLabels = { all: 'All Products', own: 'Our Collection', affiliate: 'Top Picks from Partners' };
 
-// Load products from localStorage, fallback to products.json
-async function loadProducts() {
-  const stored = localStorage.getItem('shopzone_products');
-  if (stored) {
-    try {
-      const data = JSON.parse(stored);
-      if (data.length) {
-        products = data.map(p => ({ ...p, id: String(p.id) }));
-        render();
-        return;
-      }
-    } catch {}
-  }
-  try {
-    const res = await fetch('products.json');
-    const data = await res.json();
-    if (data.length) {
-      localStorage.setItem('shopzone_products', JSON.stringify(data));
-    }
-    products = data.map(p => ({ ...p, id: String(p.id) }));
+// Load products from Firestore (real-time)
+function loadProducts() {
+  const productsRef = firebase.firestore().collection('products');
+  productsRef.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+    products = [];
+    snapshot.forEach(doc => {
+      products.push({ id: doc.id, ...doc.data() });
+    });
     render();
-  } catch {
-    grid.innerHTML = '<p style="padding:20px;color:#565959;">Could not load products.</p>';
-  }
+  }, (error) => {
+    console.error('Firestore products error:', error);
+    grid.innerHTML = '<p style="padding:20px;color:rgba(255,255,255,0.5);">Could not load products.</p>';
+  });
 }
 
 function starsSVG(rating) {
