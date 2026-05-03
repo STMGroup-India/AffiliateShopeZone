@@ -26,16 +26,19 @@ const typeLabels = { all: 'All Products', own: 'Our Collection', affiliate: 'Top
 
 // Load products from Firestore (real-time)
 function loadProducts() {
+  console.log('Loading products from Firestore...');
   const productsRef = firebase.firestore().collection('products');
-  productsRef.onSnapshot((snapshot) => {
+  productsRef.get().then((snapshot) => {
+    console.log('Firestore returned', snapshot.size, 'products');
     products = [];
     snapshot.forEach(doc => {
+      console.log('Product:', doc.id, doc.data().name);
       products.push({ id: doc.id, ...doc.data() });
     });
     render();
-  }, (error) => {
+  }).catch((error) => {
     console.error('Firestore products error:', error);
-    grid.innerHTML = '<p style="padding:20px;color:rgba(255,255,255,0.5);">Could not load products.</p>';
+    grid.innerHTML = '<p style="padding:20px;color:rgba(255,255,255,0.5);">Could not load products. Error: ' + error.message + '</p>';
   });
 }
 
