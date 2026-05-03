@@ -215,6 +215,25 @@ searchInput.addEventListener('input', () => {
 loadProducts();
 updateCart();
 
+// ===== THEME TOGGLE =====
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+  localStorage.setItem('shopzone_theme', theme);
+}
+
+// Load saved theme
+const savedTheme = localStorage.getItem('shopzone_theme') || 'dark';
+setTheme(savedTheme);
+
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+
 // ===== LOCATION =====
 const deliverTo = document.getElementById('deliverTo');
 const deliverLocation = document.getElementById('deliverLocation');
