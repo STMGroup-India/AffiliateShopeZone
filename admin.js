@@ -61,7 +61,7 @@ clearImageBtn.addEventListener('click', () => {
 
 // Render product list from Firestore (real-time)
 function listenProducts() {
-  productsRef.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+  productsRef.onSnapshot((snapshot) => {
     const products = [];
     snapshot.forEach(doc => {
       products.push({ id: doc.id, ...doc.data() });
